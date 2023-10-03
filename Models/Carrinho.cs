@@ -4,7 +4,7 @@
     {
         public int Idcarrinho { get; set; }
         public int Quantidade { get; set; }
-        public decimal Preco { get; set; }
+        public double Preco { get; set; }
         public int Comprador_IdComprador { get; set; }
     }
 }
