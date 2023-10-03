@@ -5,6 +5,12 @@ namespace Marketplace.API.DAO
 {
     public class UsuarioDAO : PostgreConn
     {
+
+       public UsuarioDAO()
+    {
+        NpgsqlConnection.GlobalTypeMapper.MapComposite<endereco_type>("endereco_type");
+    }    
+        
         public List<Usuario> Get()
         {
             List<Usuario> list = new();
@@ -12,23 +18,25 @@ namespace Marketplace.API.DAO
             {
                 conn = new NpgsqlConnection();
                 OpenConnection();
-                Command = new NpgsqlCommand("SELECT id_usuario, email, senha, conta_bancaria, nome, endereco, telefone FROM public.usuario;", conn);
+                Command = new NpgsqlCommand("SELECT id_usuario, email, senha, conta_bancaria, nome, u.endereco, telefone FROM public.usuario u;", conn);
+
 
                 DataReader = Command.ExecuteReader();
 
                 while (DataReader.Read())
                 {
 
-                    Usuario usuario = new();
-                    //  NpgsqlArray enderecoArray = new();
-                    usuario.id_usuario = DataReader.GetInt32(0);
-                    usuario.email = DataReader.GetString(1);
-                    usuario.senha = DataReader.GetString(2);
-                    usuario.conta_bancaria = DataReader.GetString(3);
-                    usuario.nome = DataReader.GetString(4);
-                   // usuario.endereco = DataReader.GetFieldValue<endereco_type>(5);
-                    usuario.telefone = DataReader.GetFieldValue<int[]>(6);
-                    list.Add(usuario);
+                            Usuario usuario = new Usuario
+                            {
+                                id_usuario = DataReader.GetInt32(0),
+                                email = DataReader.GetString(1),
+                                senha = DataReader.GetString(2),
+                                conta_bancaria = DataReader.GetString(3),
+                                nome = DataReader.GetString(4),
+                                endereco = DataReader.GetFieldValue<endereco_type>(5),
+                                telefone = DataReader.GetFieldValue<int[]>(6)
+                            };
+                            list.Add(usuario);
                 }
                 return list;
             }
@@ -62,7 +70,7 @@ namespace Marketplace.API.DAO
                     usuario.senha = DataReader.GetString(2);
                     usuario.conta_bancaria = DataReader.GetString(3);
                     usuario.nome = DataReader.GetString(4);
-                    // usuario.endereco = DataReader.GetFieldValue<Endereco>(5);
+                    usuario.endereco = DataReader.GetFieldValue<endereco_type>(5);
                     usuario.telefone = DataReader.GetFieldValue<int[]>(6);
                 }
                 else
@@ -148,7 +156,7 @@ namespace Marketplace.API.DAO
                 }
                 telefoneSTR += "}'";
 
-                string enderecoSTR = $"({end.cep} ,' {end.logradouro} ',' {end.bairro} ', {end.numero} ,' {end.cidade} ',' {end.estado}')";
+                string enderecoSTR = $"({end.cep} ,'{end.logradouro}','{end.bairro}', {end.numero} ,'{end.cidade}','{end.estado}')";
 
                 Command = new NpgsqlCommand(
                     $"UPDATE public.usuario " +

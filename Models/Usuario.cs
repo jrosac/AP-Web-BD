@@ -7,7 +7,7 @@
         public string senha { get; set; }
         public string conta_bancaria { get; set; }
         public string nome { get; set; }
-        public endereco_type endereco { get; set; } = new endereco_type();
+        public endereco_type endereco { get; set; }
         public int[] telefone { get; set; }
     }
     public class endereco_type
